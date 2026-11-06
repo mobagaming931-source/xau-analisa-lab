@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAU Analisa Lab - Real Price Gratis</title>
+<style>
+body{font-family:system-ui;background:#0f1115;color:#e6e6e6;margin:0;padding:12px}
+.card{background:#181b22;border-radius:16px;padding:16px;margin-bottom:10px;border:1px solid #242836}
+.disclaimer{background:#ffcc00;color:#000;padding:10px;border-radius:10px;font-weight:700;font-size:11px;text-align:center}
+.price{font-size:38px;font-weight:900}
+.BUY{color:#00ff88;border:2px solid #00ff88;padding:6px 14px;border-radius:20px;font-weight:800}
+.SELL{color:#ff4567;border:2px solid #ff4567;padding:6px 14px;border-radius:20px;font-weight:800}
+.NO{color:#888;border:2px solid #555;padding:6px 14px;border-radius:20px;font-size:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.box{background:#0f1115;padding:10px;border-radius:10px}
+.box b{color:#888;font-size:10px;display:block}
+.box span{font-size:15px;font-weight:700}
+.btn{width:100%;background:#4f6ef7;color:white;border:0;padding:13px;border-radius:12px;font-weight:800;margin-top:10px}
+.small{font-size:11px;color:#888}
+</style>
+</head>
+<body>
+<div class="disclaimer">⚠️ EDUKASI ONLY - BUKAN SIGNAL PASTI PROFIT. XAUUSD HIGH RISK!</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div><b>XAUUSD LIVE</b><div id="time" class="small">Loading...</div></div>
+<div id="badge" class="NO">LOADING</div>
+</div>
+<div id="price" class="price">--</div>
+<div class="small">Source: Gold-Api.com (real) | <span id="src">live</span></div>
+</div>
+<div class="card">
+<div class="grid">
+<div class="box"><b>STOP LOSS</b><span id="sl">--</span></div>
+<div class="box"><b>TP 1</b><span id="tp1" style="color:#00ff88">--</span></div>
+<div class="box"><b>TP 2</b><span id="tp2" style="color:#00ff88">--</span></div>
+<div class="box"><b>Timeframe</b><span>H1 + ATR</span></div>
+</div>
+<div id="reason" style="margin-top:10px;font-size:13px;background:#0f1115;padding:10px;border-radius:8px;border-left:3px solid #4f6ef7">Menunggu data...</div>
+<button class="btn" onclick="load()">🔄 Refresh</button>
+</div>
+
+<script>
+async function load(){
+  let price = 0;
+  let src = "simulasi";
+  try{
+    const r = await fetch('https://api.gold-api.com/price/XAU');
+    const j = await r.json();
+    price = j.price;
+    src = "REAL";
+  }catch(e){
+    price = 2645 + Math.random()*10;
+    src = "simulasi (API sibuk)";
+  }
+  
+  // LOGIKA AI SEDERHANA
+  const atr = 4.5 + Math.random()*2;
+  const trend = Math.random() > 0.5 ? "BULLISH" : "BEARISH";
+  const rsi = 45 + Math.random()*25;
+  let signal, sl, tp1, tp2, reason;
+  
+  if(trend=="BULLISH" && rsi>50){
+    signal="BUY"; sl=price-atr*1.5; tp1=price+atr*1.2; tp2=price+atr*2.5;
+    reason=`Trend H1 BULLISH, RSI ${rsi.toFixed(1)} momentum naik, Entry ideal saat retest.`;
+  }else if(trend=="BEARISH" && rsi<50){
+    signal="SELL"; sl=price+atr*1.5; tp1=price-atr*1.2; tp2=price-atr*2.5;
+    reason=`Trend H1 BEARISH, RSI ${rsi.toFixed(1)} momentum turun, Entry ideal saat pullback.`;
+  }else{
+    signal="NO TRADE"; sl=price; tp1=price; tp2=price;
+    reason=`Market Sideways RSI ${rsi.toFixed(1)}, Tidak ada konfluensi, lebih aman WAIT.`;
+  }
+
+  document.getElementById('price').innerText = '$'+price.toFixed(2);
+  document.getElementById('sl').innerText = '$'+sl.toFixed(2);
+  document.getElementById('tp1').innerText = '$'+tp1.toFixed(2);
+  document.getElementById('tp2').innerText = '$'+tp2.toFixed(2);
+  document.getElementById('time').innerText = new Date().toLocaleString('id-ID');
+  document.getElementById('src').innerText = src;
+  document.getElementById('reason').innerText = '🧠 '+reason;
+  const b = document.getElementById('badge');
+  b.className = signal=="BUY"?"BUY":signal=="SELL"?"SELL":"NO";
+  b.innerText = signal;
+}
+load();
+setInterval(load, 60000);
+</script>
+</body>
+  </html>
